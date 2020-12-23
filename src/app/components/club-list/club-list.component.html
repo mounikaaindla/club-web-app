@@ -1,0 +1,145 @@
+<nz-table #nestedTable [(nzData)]="clubs" [nzPageSize]="10">
+  <thead>
+    <tr>
+      <th></th>
+      <th>Name</th>
+      <th>Address</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <ng-template ngFor let-data [ngForOf]="nestedTable.data">
+      <tr>
+        <ng-container
+          *ngIf="!editClubCache[data.club_id].edit; else editClubTemplate"
+        >
+          <td [(nzExpand)]="data.expand"></td>
+          <td>{{ data.club_name }}</td>
+          <td>{{ data.club_address }}</td>
+          <td>
+            <span class="table-operation">
+              <a (click)="startClubEdit(data.club_id)">Edit</a>
+              <nz-divider nzType="vertical"></nz-divider>
+              <a
+                nz-popconfirm
+                nzPopconfirmTitle="Sure to delete?"
+                (nzOnConfirm)="deleteClub(data.club_id)"
+                nzPopconfirmPlacement="topLeft"
+                >Delete</a
+              >
+            </span>
+          </td>
+        </ng-container>
+        <ng-template #editClubTemplate>
+          <td>
+            <input
+              type="text"
+              nz-input
+              [(ngModel)]="editClubCache[data.club_id].data.club_name"
+            />
+          </td>
+          <td>
+            <input
+              type="text"
+              nz-input
+              [(ngModel)]="editClubCache[data.club_id].data.club_address"
+            />
+          </td>
+          <td>
+            <a (click)="saveClubEdit(data.club_id)" class="save">Save</a>
+            <nz-divider nzType="vertical"></nz-divider>
+            <a
+              nz-popconfirm
+              nzPopconfirmTitle="Sure to cancel?"
+              (nzOnConfirm)="cancelClubEdit(data.club_id)"
+              nzPopconfirmPlacement="topLeft"
+              >Cancel</a
+            >
+          </td>
+        </ng-template>
+      </tr>
+      <tr [nzExpand]="data.expand">
+        <nz-table
+          #editRowTable
+          #innerTable
+          [nzData]="data.club_members"
+          nzSize="middle"
+          [nzShowPagination]="false"
+        >
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Age</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let member of innerTable.data">
+              <ng-container
+                *ngIf="
+                  !editMemberCache[member.member_id].edit;
+                  else editTemplate
+                "
+              >
+                <td>{{ member.member_name }}</td>
+                <td>{{ member.member_age }}</td>
+                <td>
+                  <span class="table-operation">
+                    <a (click)="startMemberEdit(member.member_id)">Edit</a>
+                    <nz-divider nzType="vertical"></nz-divider>
+                    <a
+                      nz-popconfirm
+                      nzPopconfirmTitle="Sure to delete?"
+                      (nzOnConfirm)="
+                        deleteMember(member.member_id, data.club_id)
+                      "
+                      nzPopconfirmPlacement="topLeft"
+                      >Delete</a
+                    >
+                  </span>
+                </td>
+              </ng-container>
+              <ng-template #editTemplate>
+                <td>
+                  <input
+                    type="text"
+                    nz-input
+                    [(ngModel)]="
+                      editMemberCache[member.member_id].data.member_name
+                    "
+                  />
+                </td>
+                <td>
+                  <input
+                    type="text"
+                    nz-input
+                    [(ngModel)]="
+                      editMemberCache[member.member_id].data.member_age
+                    "
+                  />
+                </td>
+                <td>
+                  <a
+                    (click)="saveMemberEdit(member.member_id, data.club_id)"
+                    class="save"
+                    >Save</a
+                  >
+                  <nz-divider nzType="vertical"></nz-divider>
+                  <a
+                    nz-popconfirm
+                    nzPopconfirmTitle="Sure to cancel?"
+                    (nzOnConfirm)="
+                      cancelMemberEdit(member.member_id, data.club_id)
+                    "
+                    nzPopconfirmPlacement="topLeft"
+                    >Cancel</a
+                  >
+                </td>
+              </ng-template>
+            </tr>
+          </tbody>
+        </nz-table>
+      </tr>
+    </ng-template>
+  </tbody>
+</nz-table>
